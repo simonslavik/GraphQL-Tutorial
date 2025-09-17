@@ -50,18 +50,35 @@ const resolvers = {
         deleteGame(_, args){
             db.games = db.games.filter(game => game.id !== args.id)
             return db.games
+        },
+        addGame(_, args){
+            let game = {
+                ...args.game,
+                id: Math.floor(Math.random() * 1000).toString()
+            }
+            db.games.push(game)
+            return game
+        }
+        ,
+        updateGame(_, args){
+            db.games = db.games.map((g) => {
+                if(g.id === args.id){
+                    return {...g, ...args.edits}
+                }
+                return g
+            })
+            return db.games.find(g => g.id === args.id)
         }
     }
-}
+};
 
 const server = new ApolloServer({
     typeDefs,
     resolvers
-
 });
 
-const {url} = await startStandaloneServer(server, {
-  listen: {port: 4000},
+const { url } = await startStandaloneServer(server, {
+    listen: { port: 4000 },
 });
 
 console.log(`🚀  Server ready at port:`, 4000);
